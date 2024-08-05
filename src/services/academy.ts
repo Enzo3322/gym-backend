@@ -1,27 +1,40 @@
 import { Academy, Prisma } from "@prisma/client";
-import AcademyRepository from "../respositories/academy";
+import { AcademyRepository } from "../respositories/academy";
 
-export default class AcademyService {
-  constructor(readonly academyRepository: AcademyRepository) {}
+export interface AcademyService {
+  createAcademy(academy: Prisma.AcademyCreateInput): Promise<Academy>;
+  getAcademyById(id: string): Promise<Academy | null>;
+  updateAcademy(id: string, academy: Prisma.AcademyUpdateInput): Promise<Academy>;
+  deleteAcademy(id: string): Promise<Academy>;
+  getAllAcademies(): Promise<Academy[]>;
+}
 
-  public async createAcademy(academy: Prisma.AcademyCreateInput): Promise<Academy> {
-    return await this.academyRepository.createAcademy(academy);
+export default function AcademyService(academyRepository: AcademyRepository) {
+  async function createAcademy(academy: Prisma.AcademyCreateInput): Promise<Academy> {
+    return await academyRepository.createAcademy(academy);
   }
 
-  public async getAcademyById(id: string): Promise<Academy | null> {
-    return await this.academyRepository.getAcademyById(id);
+  async function getAcademyById(id: string): Promise<Academy | null> {
+    return await academyRepository.getAcademyById(id);
   }
 
-  public async updateAcademy(id: string, academy: Prisma.AcademyUpdateInput): Promise<Academy> {
-    return await this.academyRepository.updateAcademy(id, academy);
+  async function updateAcademy(id: string, academy: Prisma.AcademyUpdateInput): Promise<Academy> {
+    return await academyRepository.updateAcademy(id, academy);
   }
 
-  public async deleteAcademy(id: string): Promise<Academy> {
-    return await this.academyRepository.deleteAcademy(id);
+  async function deleteAcademy(id: string): Promise<Academy> {
+    return await academyRepository.deleteAcademy(id);
   }
 
-  public async getAllAcademies(): Promise<Academy[]> {
-    console.log("academyRepository", this.academyRepository);
-    return await this.academyRepository.getAllAcademies();
+  async function getAllAcademies(): Promise<Academy[]> {
+    return await academyRepository.getAllAcademies();
   }
+
+  return {
+    createAcademy,
+    getAcademyById,
+    updateAcademy,
+    deleteAcademy,
+    getAllAcademies,
+  };
 }

@@ -4,11 +4,16 @@ import UserController from "../../controllers/user";
 import UserRepository from "../../respositories/user";
 import UserService from "../../services/user";
 
-const userRouter: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
+const makeController = () => {
   const prisma = new PrismaClient();
-  const userRepository = new UserRepository(prisma);
-  const userService = new UserService(userRepository);
-  const userController = new UserController(userService);
+  const userRepository = UserRepository(prisma);
+  const userService = UserService(userRepository);
+  const userController = UserController(userService);
+
+  return userController;
+};
+const userRouter: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
+  const userController = makeController();
 
   fastify.get("/", userController.getAllUsers);
   fastify.get("/:id", userController.getUserById);

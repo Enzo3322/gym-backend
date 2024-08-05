@@ -1,32 +1,39 @@
 import { Academy, Prisma, PrismaClient } from "@prisma/client";
 
-export default class AcademyRepository {
-  constructor(readonly prisma: PrismaClient) {}
+export interface AcademyRepository {
+  createAcademy(academy: Prisma.AcademyCreateInput): Promise<Academy>;
+  getAcademyById(id: string): Promise<Academy | null>;
+  getAcademyByEmail(email: string): Promise<Academy | null>;
+  updateAcademy(id: string, academy: Prisma.AcademyUpdateInput): Promise<Academy>;
+  deleteAcademy(id: string): Promise<Academy>;
+  getAllAcademies(): Promise<Academy[]>;
+}
 
-  public async createAcademy(academy: Prisma.AcademyCreateInput): Promise<Academy> {
-    return await this.prisma.academy.create({
+export default function AcademyRepository(prisma: PrismaClient): AcademyRepository {
+  async function createAcademy(academy: Prisma.AcademyCreateInput): Promise<Academy> {
+    return await prisma.academy.create({
       data: academy,
     });
   }
 
-  public async getAcademyById(id: string): Promise<Academy | null> {
-    return await this.prisma.academy.findUnique({
+  async function getAcademyById(id: string): Promise<Academy | null> {
+    return await prisma.academy.findUnique({
       where: {
         id: id,
       },
     });
   }
 
-  public async getAcademyByEmail(email: string): Promise<Academy | null> {
-    return await this.prisma.academy.findUnique({
+  async function getAcademyByEmail(email: string): Promise<Academy | null> {
+    return await prisma.academy.findUnique({
       where: {
         email: email,
       },
     });
   }
 
-  public async updateAcademy(id: string, academy: Prisma.AcademyUpdateInput): Promise<Academy> {
-    return await this.prisma.academy.update({
+  async function updateAcademy(id: string, academy: Prisma.AcademyUpdateInput): Promise<Academy> {
+    return await prisma.academy.update({
       where: {
         id: id,
       },
@@ -34,15 +41,24 @@ export default class AcademyRepository {
     });
   }
 
-  public async deleteAcademy(id: string): Promise<Academy> {
-    return await this.prisma.academy.delete({
+  async function deleteAcademy(id: string): Promise<Academy> {
+    return await prisma.academy.delete({
       where: {
         id: id,
       },
     });
   }
 
-  public async getAllAcademies(): Promise<Academy[]> {
-    return await this.prisma.academy.findMany();
+  async function getAllAcademies(): Promise<Academy[]> {
+    return await prisma.academy.findMany();
   }
+
+  return {
+    createAcademy,
+    getAcademyById,
+    getAcademyByEmail,
+    updateAcademy,
+    deleteAcademy,
+    getAllAcademies,
+  };
 }

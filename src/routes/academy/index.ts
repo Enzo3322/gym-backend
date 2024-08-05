@@ -6,11 +6,9 @@ import AcademyService from "../../services/academy";
 
 const academyRouter: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   const prisma = new PrismaClient();
-  const academyRepository = new AcademyRepository(prisma);
-  const academyService = new AcademyService(academyRepository);
-  const academyController = new AcademyController(academyService);
-
-  console.log({ academyController: academyController.getAllAcademies });
+  const academyRepository = AcademyRepository(prisma);
+  const academyService = AcademyService(academyRepository);
+  const academyController = AcademyController(academyService);
 
   fastify.get("/", academyController.getAllAcademies);
   fastify.get("/:id", academyController.getAcademyById);

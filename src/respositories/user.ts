@@ -2,13 +2,20 @@ import { Prisma, PrismaClient, User } from "@prisma/client";
 
 import bcrypt from "bcrypt";
 
-export default class UserRepository {
-  constructor(readonly prisma: PrismaClient) {}
+export interface UserRepository {
+  createUser(user: Prisma.UserCreateInput): Promise<User>;
+  getUserById(id: string): Promise<User | null>;
+  getUserByEmail(email: string): Promise<User | null>;
+  updateUser(id: string, user: Prisma.UserUpdateInput): Promise<User>;
+  deleteUser(id: string): Promise<User>;
+  getAllUsers(): Promise<User[]>;
+}
 
-  public async createUser(user: Prisma.UserCreateInput): Promise<User> {
+export default function UserRepository(prisma: PrismaClient) {
+  async function createUser(user: Prisma.UserCreateInput): Promise<User> {
     const hashedPassword = await bcrypt.hash(user.password, 10);
 
-    return await this.prisma.user.create({
+    return await prisma.user.create({
       data: {
         ...user,
         password: hashedPassword,
@@ -16,24 +23,24 @@ export default class UserRepository {
     });
   }
 
-  public async getUserById(id: string): Promise<User | null> {
-    return await this.prisma.user.findUnique({
+  async function getUserById(id: string): Promise<User | null> {
+    return await prisma.user.findUnique({
       where: {
         id: id,
       },
     });
   }
 
-  public async getUserByEmail(email: string): Promise<User | null> {
-    return await this.prisma.user.findUnique({
+  async function getUserByEmail(email: string): Promise<User | null> {
+    return await prisma.user.findUnique({
       where: {
         email: email,
       },
     });
   }
 
-  public async updateUser(id: string, user: Prisma.UserUpdateInput): Promise<User> {
-    return await this.prisma.user.update({
+  async function updateUser(id: string, user: Prisma.UserUpdateInput): Promise<User> {
+    return await prisma.user.update({
       where: {
         id: id,
       },
@@ -41,15 +48,24 @@ export default class UserRepository {
     });
   }
 
-  public async deleteUser(id: string): Promise<User> {
-    return await this.prisma.user.delete({
+  async function deleteUser(id: string): Promise<User> {
+    return await prisma.user.delete({
       where: {
         id: id,
       },
     });
   }
 
-  public async getAllUsers(): Promise<User[]> {
-    return await this.prisma.user.findMany();
+  async function getAllUsers(): Promise<User[]> {
+    return await prisma.user.findMany();
   }
+
+  return {
+    createUser,
+    getUserById,
+    getUserByEmail,
+    updateUser,
+    deleteUser,
+    getAllUsers,
+  };
 }
