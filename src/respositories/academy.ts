@@ -1,4 +1,5 @@
 import { Academy, Prisma, PrismaClient } from "@prisma/client";
+import bcrypt from "bcrypt";
 
 export interface AcademyRepository {
   createAcademy(academy: Prisma.AcademyCreateInput): Promise<Academy>;
@@ -11,8 +12,9 @@ export interface AcademyRepository {
 
 export default function AcademyRepository(prisma: PrismaClient): AcademyRepository {
   async function createAcademy(academy: Prisma.AcademyCreateInput): Promise<Academy> {
+    const hashedPassword = await bcrypt.hash(academy.password, 10);
     return await prisma.academy.create({
-      data: academy,
+      data: { ...academy, password: hashedPassword },
     });
   }
 
@@ -50,7 +52,13 @@ export default function AcademyRepository(prisma: PrismaClient): AcademyReposito
   }
 
   async function getAllAcademies(): Promise<Academy[]> {
-    return await prisma.academy.findMany();
+    const academies = await prisma.academy.findMany();
+
+    const academiesWithoutPassword = academies.map((academy) => {
+      return { ...academy, password: "" };
+    });
+
+    return academiesWithoutPassword;
   }
 
   return {

@@ -12,13 +12,12 @@ const makeController = () => {
 
   return userController;
 };
+
 const userRouter: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   const userController = makeController();
 
   fastify.get("/", userController.getAllUsers);
-  fastify.get("/:id", userController.getUserById);
   fastify.post("/", userController.createUser);
-  fastify.put("/:id", userController.updateUser);
   fastify.delete("/:id", userController.deleteUser);
 };
 

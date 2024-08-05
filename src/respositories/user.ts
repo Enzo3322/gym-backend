@@ -4,9 +4,7 @@ import bcrypt from "bcrypt";
 
 export interface UserRepository {
   createUser(user: Prisma.UserCreateInput): Promise<User>;
-  getUserById(id: string): Promise<User | null>;
   getUserByEmail(email: string): Promise<User | null>;
-  updateUser(id: string, user: Prisma.UserUpdateInput): Promise<User>;
   deleteUser(id: string): Promise<User>;
   getAllUsers(): Promise<User[]>;
 }
@@ -23,28 +21,11 @@ export default function UserRepository(prisma: PrismaClient) {
     });
   }
 
-  async function getUserById(id: string): Promise<User | null> {
-    return await prisma.user.findUnique({
-      where: {
-        id: id,
-      },
-    });
-  }
-
   async function getUserByEmail(email: string): Promise<User | null> {
     return await prisma.user.findUnique({
       where: {
         email: email,
       },
-    });
-  }
-
-  async function updateUser(id: string, user: Prisma.UserUpdateInput): Promise<User> {
-    return await prisma.user.update({
-      where: {
-        id: id,
-      },
-      data: user,
     });
   }
 
@@ -62,9 +43,7 @@ export default function UserRepository(prisma: PrismaClient) {
 
   return {
     createUser,
-    getUserById,
     getUserByEmail,
-    updateUser,
     deleteUser,
     getAllUsers,
   };
